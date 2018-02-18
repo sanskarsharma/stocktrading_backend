@@ -1,0 +1,27 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }} - For admins</title>
+      {% else %}
+      <title>Growthplug dashboard</title>
+      {% endif %}
+    </head>
+    <body>
+        <div>
+            Stock trade v1.0:
+            <a href="{{ url_for('home') }}">Home</a>
+        </div>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>
