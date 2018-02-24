@@ -35,6 +35,7 @@ def live():
     # res = Histo.query.filter_by(symbol="AAPL")
     # return str(res[0].id)
     ticker = request.form.get("ticker") or "AAPL"
+    returntype= request.form.get("returntype") or "json"
 
     api = requests.get(url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="+ ticker+"&apikey=WRRV1W3LLQEC5MKX")
     json_data = api.json()
@@ -44,17 +45,57 @@ def live():
     list = []
 
     c=0
-    for m, n in need.items():
-        c = c+1
+    if( returntype == "json"):
+        datelist =[]
+        openlist = []
+        highlist= []
+        lowlist= []
+        closelist =[]
+        adjcloselist= []
+        volumelist= []
+        dividendamtlist = []
+        splitcoefflist=[]
+        for date, data in need.items():
+            datelist.append(date)
+            openlist.append(float(data["1. open"]))
+            highlist.append(float(data["2. high"]))
+            lowlist.append(float(data["3. low"]))
+            closelist.append(float(data["4. close"]))
+            adjcloselist.append(float(data["5. adjusted close"]))
+            volumelist.append(float(data["6. volume"]))
+            dividendamtlist.append(float(data["7. dividend amount"]))
+            splitcoefflist.append(float(data["8. split coefficient"]))
 
-        obj = Prices()      # add more fileds to class Prices and frontend left
-        obj.date =  m
-        obj.open = n["1. open"]
-        obj.high = n["2. high"]
-        obj.low = n["3. low"]
-        obj.close = n["4. close"]
-        list.append(m)
+        dict = {}
+        dict["date"] = datelist
+        dict["open"] = openlist
+        dict["high"] = highlist
+        dict["low"] = lowlist
+        dict["close"] = closelist
+        dict["adjclose"] = adjcloselist
+        dict["volume"] = volumelist
+        dict["dividend"] = dividendamtlist
+        dict["splitcoeff"] = splitcoefflist
+
+        datajson = json.dumps(dict)
+        print datajson
+        return datajson
         
+        
+        
+        
+            
+
+    else:
+        for m, n in need.items():
+            c = c+1
+            obj = Prices()      # add more fileds to class Prices and frontend left
+            obj.date =  m
+            obj.open = n["1. open"]
+            obj.high = n["2. high"]
+            obj.low = n["3. low"]
+            obj.close = n["4. close"]
+            list.append(m)    
     return str(need) #render_template("market_analysis.html", list = list)
 
 
