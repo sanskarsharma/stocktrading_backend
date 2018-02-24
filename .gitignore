@@ -2,3 +2,6 @@ virtualenv
 .vscode 
 virtenv
 __pycache__
+venv
+growthplugstoack.pyc
+config.pyc
