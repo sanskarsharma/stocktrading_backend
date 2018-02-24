@@ -2,3 +2,5 @@ virtualenv
 .vscode 
 virtenv
 __pycache__
+growthplug.sql
+venv

@@ -30,6 +30,7 @@ def test():
     res = Histo.query.filter_by(symbol="AAPL")
     return str(res[0].id)
 
+import collections
 @app_instance.route("/live", methods=["POST"])
 def live():
     # res = Histo.query.filter_by(symbol="AAPL")
@@ -39,7 +40,10 @@ def live():
 
     api = requests.get(url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="+ ticker+"&apikey=WRRV1W3LLQEC5MKX")
     json_data = api.json()
-    need = json_data["Time Series (Daily)"]
+    json_data = json.dumps(json_data)
+    jdict = json.load(json_data, object_pairs_hook=collections.OrderedDict)
+    jdict = jdict["Time Series (Daily)"]
+    need = jdict
     #n = need["2018-01-09"]
     #print(type(n))
     list = []
@@ -78,8 +82,9 @@ def live():
         dict["splitcoeff"] = splitcoefflist
 
         datajson = json.dumps(dict)
-        print datajson
-        return datajson
+        response = datajson
+        #response.headers.add('Access-Control-Allow-Origin','*')
+        return response
         
         
         
