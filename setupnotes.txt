@@ -1,0 +1,50 @@
+
+#installing pip
+sudo apt-get install python3-pip
+
+#install setuptools also on DO server, not installed by default
+python3 -m pip install --upgrade pip setuptools wheel
+
+desc (dont'follow it, follow guide below) : https://www.digitalocean.com/community/tutorials/common-python-tools-using-virtualenv-installing-with-pip-and-managing-packages
+guide : https://packaging.python.org/tutorials/installing-packages/
+
+#installing virtualenv
+sudo pip3 install virtualenv 
+
+#creating virtualenv
+cd projectdir
+virtualenv virtenv
+
+You can also use a Python interpreter of your choice by:
+virtualenv -p /usr/bin/python2.7 venv
+
+#setting up mysql server
+sudo apt-get install mysql-server
+
+Now, generally to use a predefined db schema we export it from our local pc and include it in git repo of our project and then go on to import it in our mysql server on remote.
+BUT, in this proj the exported .sql file of our db is about 76 MB, too big, not allowed on git repo.
+So, has to be uploded to remote server using any other way :
+SFTP (simply SSH-FTP)
+Here is the guide for trasfering files via SFTP :
+https://www.digitalocean.com/community/tutorials/how-to-use-sftp-to-securely-transfer-files-with-a-remote-server
+
+command to export .sql file : mysqldump -u root -p growthplug > growthplug.sql
+
+
+Now after the file transfer is done to the appropriate folder on remote
+Go to that folder and use the following commands to import it into mysql-server :
+1) first open mysql shell and create a new db for importing, say "growthplug"
+2) exit the shell and use below command to import .sql fie to the newly created db
+3) mysql -u root -p growthplug < growthplug.sql
+Done.
+Check once via mysql shell to confirm.
+
+
+
+
+#errors encountered
+https://stackoverflow.com/questions/45168495/deploying-python-flask-app-on-heroku-gives-error-with-functools32
+https://stackoverflow.com/questions/35991403/python-pip-install-gives-command-python-setup-py-egg-info-failed-with-error-c
+
+for installing setuptools(req by pip)
+https://packaging.python.org/tutorials/installing-packages/

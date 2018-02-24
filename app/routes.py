@@ -30,6 +30,7 @@ def test():
     res = Histo.query.filter_by(symbol="AAPL")
     return str(res[0].id)
 
+import collections
 @app_instance.route("/live", methods=["POST"])
 def live():
     # res = Histo.query.filter_by(symbol="AAPL")
@@ -37,14 +38,14 @@ def live():
     ticker = request.form.get("ticker") or "AAPL"
     returntype= request.form.get("returntype") or "json"
 
-    api = requests.get(url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="+ ticker+"&apikey=WRRV1W3LLQEC5MKX")
-    json_data = api.json()
-    need = json_data["Time Series (Daily)"]
-    #n = need["2018-01-09"]
-    #print(type(n))
-    list = []
+    api_response = requests.get(url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="+ ticker+"&apikey=WRRV1W3LLQEC5MKX", stream=True)
+    raw_data = api_response.raw.data  
+    # print(type(rawres)) - str
 
-    c=0
+    my_ordered_dict = json.loads(raw_data, object_pairs_hook=collections.OrderedDict)
+
+    need = my_ordered_dict["Time Series (Daily)"]
+    
     if( returntype == "json"):
         datelist =[]
         openlist = []
@@ -76,17 +77,13 @@ def live():
         dict["volume"] = volumelist
         dict["dividend"] = dividendamtlist
         dict["splitcoeff"] = splitcoefflist
-
+        
         datajson = json.dumps(dict)
-        print datajson
-        return datajson
-        
-        
-        
-        
-            
+        return datajson          
 
     else:
+        c=0
+        list =[]
         for m, n in need.items():
             c = c+1
             obj = Prices()      # add more fileds to class Prices and frontend left
@@ -96,7 +93,8 @@ def live():
             obj.low = n["3. low"]
             obj.close = n["4. close"]
             list.append(m)    
-    return str(need) #render_template("market_analysis.html", list = list)
+        
+        return str(need) #render_template("market_analysis.html", list = list)
 
 
 @app_instance.route("/stockinfo",methods=["POST"])
@@ -106,6 +104,15 @@ def stockinfo():
 
     data = Companyinfo.query.filter_by(ticker=ticker).first()
 
+    res = {}
+
+    if data is None :
+        dict = {}
+        dict["error"] = "Invalid Ticker or company data not present in database"
+        dict["status"] = "0"
+        jso =json.dumps(dict)
+        return jso
+
     datadict = {}
     datadict["id"]= data.id
     datadict["ticker"]= data.ticker
@@ -114,9 +121,11 @@ def stockinfo():
     datadict["sector"]= data.sector
     datadict["industry"]= data.industry
     
-    datajson = json.dumps(datadict)
-    print(datajson)
-    return datajson
+    res["status"]= "1"
+    res["data"] = datadict
+    resjson = json.dumps(res)
+    print(resjson)
+    return resjson
 
 @app_instance.route("/stockinfo/<ticker>",methods=["GET"])
 def stockinfotick(ticker):
@@ -130,9 +139,12 @@ def stockinfotick(ticker):
     datadict["sector"]= data.sector
     datadict["industry"]= data.industry
     
-    datajson = json.dumps(datadict)
-    print(datajson)
-    return datajson
+    res["status"]= "1"
+    res["data"] = datadict
+
+    resjson = json.dumps(res)
+    print(resjson)
+    return resjson
 
 
 @app_instance.route("/stockinfo/<ticker>/<field>",methods=["GET"])

@@ -5,3 +5,4 @@ __pycache__
 venv
 growthplugstoack.pyc
 config.pyc
+app/__pycache__
