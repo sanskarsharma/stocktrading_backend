@@ -6,3 +6,5 @@ venv
 growthplugstoack.pyc
 config.pyc
 app/__pycache__
+growthplug.sql
+venv
