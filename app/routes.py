@@ -33,8 +33,7 @@ def test():
 import collections
 @app_instance.route("/live", methods=["POST"])
 def live():
-    # res = Histo.query.filter_by(symbol="AAPL")
-    # return str(res[0].id)
+   
     ticker = request.form.get("ticker") or "AAPL"
     returntype= request.form.get("returntype") or "json"
 
@@ -43,6 +42,14 @@ def live():
     # print(type(rawres)) - str
 
     my_ordered_dict = json.loads(raw_data, object_pairs_hook=collections.OrderedDict)
+    
+    resdict = {}
+
+    if "Error Message" in my_ordered_dict:
+        resdict["status"] = "0"
+        resdict["error"] = "Invalid Request, plese check input"
+        resjson = json.dumps(resdict)
+        return resjson
 
     need = my_ordered_dict["Time Series (Daily)"]
     
@@ -78,9 +85,11 @@ def live():
         dict["dividend"] = dividendamtlist
         dict["splitcoeff"] = splitcoefflist
         
-        datajson = json.dumps(dict)
-        return datajson          
-
+        resdict["status"] = "1"
+        resdict["data"] = dict
+        resjson = json.dumps(resdict)
+        return resjson
+        
     else:
         c=0
         list =[]

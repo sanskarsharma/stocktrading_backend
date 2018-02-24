@@ -8,3 +8,4 @@ config.pyc
 app/__pycache__
 growthplug.sql
 venv
+app/__init__.pyc, app/routes.pyc
