@@ -38,7 +38,7 @@ def live():
     returntype= request.form.get("returntype") or "json"
 
     api_response = requests.get(url = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol="+ ticker+"&apikey=WRRV1W3LLQEC5MKX", stream=True)
-    raw_data = api_response.raw.data  
+    raw_data = api_response.text 
     # print(type(rawres)) - str
 
     my_ordered_dict = json.loads(raw_data, object_pairs_hook=collections.OrderedDict)
