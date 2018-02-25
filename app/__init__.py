@@ -4,6 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS, cross_origin
 
+import logging
+from logging.handlers import SMTPHandler, RotatingFileHandler
+import os
+
+
 app_instance = Flask(__name__)
 CORS(app_instance)
 
@@ -54,3 +59,16 @@ migrate = Migrate(app_instance,db_instance)
 
 
 from app import routes, models
+
+if not app_instance.debug :
+
+    # below code is for writing log files
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    file_handler = RotatingFileHandler('logs/stocktradingapp.log', maxBytes=10240, backupCount=10)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s \n \t\t [in %(pathname)s:%(lineno)d]'))
+    file_handler.setLevel(logging.INFO)
+    app_instance.logger.addHandler(file_handler)
+
+    app_instance.logger.setLevel(logging.INFO)
+    app_instance.logger.info('stocktradingapp startup')
